@@ -31,7 +31,7 @@ class Converter extends Component {
     if (this.state.fromCurrency !== this.state.toCurrency) {
       axios
         .get(
-          `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.fromCurrency}&symbols=${this.state.toCurrency}`
+          `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.fromCurrency}`
         )
         .then((response) => {
           const result =

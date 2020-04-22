@@ -30,39 +30,31 @@ class Converter extends Component {
 
   convertHandler = () => {
     if (this.state.isTrue === true) {
-      if (this.state.fromCurrency !== this.state.toCurrency) {
-        axios
-          .get(
-            `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.fromCurrency}`
-          )
-          .then((response) => {
-            const result =
-              this.state.amount * response.data.rates[this.state.toCurrency];
-            this.setState({ result: result.toFixed(5) });
-          })
-          .catch((err) => {
-            console.log("Opps", err.message);
-          });
-      } else {
-        this.setState({ result: "You can't convert the same currency!" });
-      }
+      axios
+        .get(
+          `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.fromCurrency}`
+        )
+        .then((response) => {
+          const result =
+            this.state.amount * response.data.rates[this.state.toCurrency];
+          this.setState({ result: result.toFixed(5) });
+        })
+        .catch((err) => {
+          console.log("Opps", err.message);
+        });
     } else {
-      if (this.state.fromCurrency !== this.state.toCurrency) {
-        axios
-          .get(
-            `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.toCurrency}`
-          )
-          .then((response) => {
-            const amount =
-              this.state.result * response.data.rates[this.state.fromCurrency];
-            this.setState({ amount: amount.toFixed(5) });
-          })
-          .catch((err) => {
-            console.log("Opps", err.message);
-          });
-      } else {
-        this.setState({ amount: "You can't convert the same currency!" });
-      }
+      axios
+        .get(
+          `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.toCurrency}`
+        )
+        .then((response) => {
+          const amount =
+            this.state.result * response.data.rates[this.state.fromCurrency];
+          this.setState({ amount: amount.toFixed(5) });
+        })
+        .catch((err) => {
+          console.log("Opps", err.message);
+        });
     }
   };
 

@@ -137,6 +137,7 @@ class Converter extends Component {
             ))}
           </select>
         </div>
+        <br />
         <div className="Form">
           <button onClick={this.handleClear}>Clear</button>
           <span>&nbsp;</span>

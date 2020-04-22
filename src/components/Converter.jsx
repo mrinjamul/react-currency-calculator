@@ -5,7 +5,7 @@ import "./Converter.css";
 
 class Converter extends Component {
   state = {
-    result: null,
+    result: 1,
     fromCurrency: "USD",
     toCurrency: "INR",
     amount: 1,
@@ -45,6 +45,24 @@ class Converter extends Component {
       this.setState({ result: "You can't convert the same currency!" });
     }
   };
+  toconvertHandler = () => {
+    if (this.state.fromCurrency !== this.state.toCurrency) {
+      axios
+        .get(
+          `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.toCurrency}`
+        )
+        .then((response) => {
+          const amount =
+            this.state.result * response.data.rates[this.state.fromCurrency];
+          this.setState({ amount: amount.toFixed(5) });
+        })
+        .catch((err) => {
+          console.log("Opps", err.message);
+        });
+    } else {
+      this.setState({ amount: "You can't convert the same currency!" });
+    }
+  };
 
   selectHandler = (event) => {
     if (event.target.name === "from") {
@@ -55,10 +73,16 @@ class Converter extends Component {
     }
   };
 
+  // handleSwap = () => {
+  //   let oldcurrency = this.state.fromCurrency;
+  //   this.setState({ fromCurrency: this.state.toCurrency });
+  //   this.setState({ toCurrency: oldcurrency });
+  // };
+
   handleSwap = () => {
-    let oldcurrency = this.state.fromCurrency;
-    this.setState({ fromCurrency: this.state.toCurrency });
-    this.setState({ toCurrency: oldcurrency });
+    let oldcurrency = this.state.amount;
+    this.setState({ amount: this.state.result });
+    this.setState({ result: oldcurrency });
   };
 
   render() {
@@ -83,6 +107,15 @@ class Converter extends Component {
               <option key={cur}>{cur}</option>
             ))}
           </select>
+          <button onClick={this.convertHandler}>Convert</button>
+        </div>
+        <div className="Form">
+          <input
+            name="result"
+            type="text"
+            value={this.state.result}
+            onChange={(event) => this.setState({ result: event.target.value })}
+          />
           <select
             name="to"
             onChange={(event) => this.selectHandler(event)}
@@ -92,11 +125,12 @@ class Converter extends Component {
               <option key={cur}>{cur}</option>
             ))}
           </select>
-          <button onClick={this.handleSwap}>Swap</button>
-          <span> &nbsp;&nbsp; </span>
-          <button onClick={this.convertHandler}>Convert</button>
+          <button onClick={this.toconvertHandler}>Convert</button>
         </div>
-        {this.state.result && <h3>{this.state.result}</h3>}
+        <div className="Form">
+          <button onClick={this.handleSwap}>Swap</button>
+        </div>
+        {/* {this.state.result && <h3>{this.state.result}</h3>} */}
       </div>
     );
   }

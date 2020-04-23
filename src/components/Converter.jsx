@@ -5,11 +5,12 @@ import "./Converter.css";
 
 class Converter extends Component {
   state = {
-    result: null,
+    result: 1,
     fromCurrency: "USD",
     toCurrency: "INR",
     amount: 1,
     currencies: [],
+    isTrue: true,
   };
 
   componentDidMount() {
@@ -28,7 +29,7 @@ class Converter extends Component {
   }
 
   convertHandler = () => {
-    if (this.state.fromCurrency !== this.state.toCurrency) {
+    if (this.state.isTrue === true) {
       axios
         .get(
           `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.fromCurrency}`
@@ -42,23 +43,58 @@ class Converter extends Component {
           console.log("Opps", err.message);
         });
     } else {
-      this.setState({ result: "You can't convert the same currency!" });
+      axios
+        .get(
+          `https://api.exchangerate-api.com/v4/latest/EUR?base=${this.state.toCurrency}`
+        )
+        .then((response) => {
+          const amount =
+            this.state.result * response.data.rates[this.state.fromCurrency];
+          this.setState({ amount: amount.toFixed(5) });
+        })
+        .catch((err) => {
+          console.log("Opps", err.message);
+        });
     }
   };
 
   selectHandler = (event) => {
     if (event.target.name === "from") {
-      this.setState({ fromCurrency: event.target.value });
+      this.setState({ fromCurrency: event.target.value, isTrue: true });
     }
     if (event.target.name === "to") {
-      this.setState({ toCurrency: event.target.value });
+      this.setState({ toCurrency: event.target.value, isTrue: false });
     }
   };
 
+  // handleSwap = () => {
+  //   let oldcurrency = this.state.fromCurrency;
+  //   this.setState({ fromCurrency: this.state.toCurrency });
+  //   this.setState({ toCurrency: oldcurrency });
+  // };
+
   handleSwap = () => {
-    let oldcurrency = this.state.fromCurrency;
-    this.setState({ fromCurrency: this.state.toCurrency });
-    this.setState({ toCurrency: oldcurrency });
+    this.setState({ isTrue: true });
+    let oldcurrency = this.state.amount;
+    this.setState({ amount: this.state.result });
+    this.setState({ result: oldcurrency });
+  };
+
+  handleChange = (event) => {
+    this.setState({ amount: event.target.value });
+    this.setState({ isTrue: true });
+  };
+
+  tohandleChange = (event) => {
+    this.setState({ result: event.target.value });
+    this.setState({ isTrue: false });
+  };
+  handleClear = () => {
+    this.setState({
+      result: 1,
+      amount: 1,
+      isTrue: true,
+    });
   };
 
   render() {
@@ -72,7 +108,7 @@ class Converter extends Component {
             name="amount"
             type="text"
             value={this.state.amount}
-            onChange={(event) => this.setState({ amount: event.target.value })}
+            onChange={(event) => this.handleChange(event)}
           />
           <select
             name="from"
@@ -83,6 +119,14 @@ class Converter extends Component {
               <option key={cur}>{cur}</option>
             ))}
           </select>
+        </div>
+        <div className="Form">
+          <input
+            name="result"
+            type="text"
+            value={this.state.result}
+            onChange={(event) => this.tohandleChange(event)}
+          />
           <select
             name="to"
             onChange={(event) => this.selectHandler(event)}
@@ -92,11 +136,16 @@ class Converter extends Component {
               <option key={cur}>{cur}</option>
             ))}
           </select>
+        </div>
+        <br />
+        <div className="Form">
+          <button onClick={this.handleClear}>Clear</button>
+          <span>&nbsp;</span>
           <button onClick={this.handleSwap}>Swap</button>
-          <span> &nbsp;&nbsp; </span>
+          <span>&nbsp;</span>
           <button onClick={this.convertHandler}>Convert</button>
         </div>
-        {this.state.result && <h3>{this.state.result}</h3>}
+        {/* {this.state.result && <h3>{this.state.result}</h3>} */}
       </div>
     );
   }
